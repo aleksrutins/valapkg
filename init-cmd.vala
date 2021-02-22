@@ -23,6 +23,7 @@ void init() {
 
     var generator = new Json.Generator();
     generator.set_root(pkg_builder.get_root());
+    generator.pretty = true;
     var pkg_json = generator.to_data(null);
 
     console.log("Generated JSON:");
