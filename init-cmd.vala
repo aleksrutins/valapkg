@@ -16,8 +16,8 @@ void init() {
         set_member_name("website");
         add_string_value(website);
         set_member_name("dependencies");
-        begin_array();
-        end_array();
+        begin_object();
+        end_object();
         end_object();
     }
 
