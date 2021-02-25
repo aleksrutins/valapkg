@@ -1,0 +1,21 @@
+name: valapkg # you probably want to 'snapcraft register <name>'
+base: core20 # the base snap is the execution environment for this snap
+version: 'latest-git' # just for humans, typically '1.2+git' or '1.3.2'
+summary: A package manager for Vala projects. # 79 char long summary
+description: |
+  Valapkg allows you to manage your Vala project's dependencies through a command line interface. It pulls packages from GitHub and uses an NPM-like 'package.json' file.
+
+grade: devel # must be 'stable' to release into candidate/stable channels
+confinement: strict # use 'strict' once you have the right plugs and slots
+apps:
+  valapkg:
+    command: usr/local/bin/valapkg
+    plugs:
+      - home
+parts:
+  my-part:
+    # See 'snapcraft plugins'
+    plugin: meson
+    source: '.'
+    build-packages: [pkg-config, libglib2.0-dev, libsoup2.4-dev, libjson-glib-dev, valac]
+    stage-packages: [libglib2.0-0, libsoup2.4-1, libjson-glib-1.0-0]

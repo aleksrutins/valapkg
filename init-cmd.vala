@@ -7,19 +7,17 @@ void init() {
     console.log("Building JSON");
     var pkg_builder = new Json.Builder();
 
-    with(pkg_builder) {
-        begin_object();
-        set_member_name("name");
-        add_string_value(projectName);
-        set_member_name("author");
-        add_string_value(author);
-        set_member_name("website");
-        add_string_value(website);
-        set_member_name("dependencies");
-        begin_object();
-        end_object();
-        end_object();
-    }
+    pkg_builder.begin_object();
+    pkg_builder.set_member_name("name");
+    pkg_builder.add_string_value(projectName);
+    pkg_builder.set_member_name("author");
+    pkg_builder.add_string_value(author);
+    pkg_builder.set_member_name("website");
+    pkg_builder.add_string_value(website);
+    pkg_builder.set_member_name("dependencies");
+    pkg_builder.begin_object();
+    pkg_builder.end_object();
+    pkg_builder.end_object();
 
     var generator = new Json.Generator();
     generator.set_root(pkg_builder.get_root());
