@@ -15,8 +15,8 @@ void init() {
     pkg_builder.set_member_name("website");
     pkg_builder.add_string_value(website);
     pkg_builder.set_member_name("dependencies");
-    pkg_builder.begin_object();
-    pkg_builder.end_object();
+    pkg_builder.begin_array();
+    pkg_builder.end_array();
     pkg_builder.end_object();
 
     var generator = new Json.Generator();
@@ -32,13 +32,8 @@ void init() {
         return;
     }
     console.log("Writing package.json");
-    var package_json = File.new_for_path("package.json");
     try {
-        if(package_json.query_exists()) package_json.@delete();
-        FileOutputStream os = package_json.create (FileCreateFlags.PRIVATE);
-        size_t out_bytes;
-        os.write_all(pkg_json.data, out out_bytes);
-        os.close();
+        Package.write(pkg_builder.get_root());
 	} catch (Error e) {
         console.error(e.message);
         return;

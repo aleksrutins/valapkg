@@ -5,6 +5,9 @@ int main(string[] args) {
         case "init":
             init();
             break;
+        case "add":
+            addPackage(args[2]);
+            break;
     }
     return 0;
 }
