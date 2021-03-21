@@ -8,6 +8,9 @@ int main(string[] args) {
         case "add":
             addPackage(args[2]);
             break;
+	case "build":
+	    buildProject();
+	    break;
     }
     return 0;
 }

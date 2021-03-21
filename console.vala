@@ -1,4 +1,4 @@
-class Console {
+public class Console {
     private string tag;
     public Console(string tag) {
         this.tag = tag;
