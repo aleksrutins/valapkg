@@ -38,5 +38,15 @@ void init() {
         console.error(e.message);
         return;
 	}
-
+    try {
+        console.log("Initializing with Git");
+        Util.spawn_stdout("git init");
+        Util.spawn_stdout("git add -A");
+        console.log("Creating initial commit");
+        Util.spawn_stdout_v("git", "commit", "-m", "Initial commit");
+        console.log("Done!");
+    } catch(Error e) {
+        console.error("An error occured. Please make sure you have Git installed.");
+        return;
+    }
 }
