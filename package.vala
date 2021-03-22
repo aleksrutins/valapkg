@@ -31,8 +31,8 @@ namespace Package {
         pkg_name = repo.split("/")[1];
         console.log(@"Package name: $pkg_name");
         Posix.system("mkdir -p modules");
-        console.log(@"Running: git clone git://github.com/$repo.git -b $branch modules/$pkg_name");
-        Posix.system(@"git clone git://github.com/$repo.git -b $branch modules/$pkg_name");
+        console.log(@"Running: git submodule add -b $branch git://github.com/$repo.git modules/$pkg_name");
+        Posix.system(@"git submodule add -b $branch git://github.com/$repo.git modules/$pkg_name");
         return pkg_name;
     }
 }

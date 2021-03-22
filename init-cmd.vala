@@ -44,6 +44,8 @@ void init() {
         Util.spawn_stdout("git add -A");
         console.log("Creating initial commit");
         Util.spawn_stdout_v("git", "commit", "-m", "Initial commit");
+        console.log("Initializing for submodules");
+        Util.spawn_stdout("git submodule init");
         console.log("Done!");
     } catch(Error e) {
         console.error("An error occured. Please make sure you have Git installed.");
