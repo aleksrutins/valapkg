@@ -17,13 +17,18 @@ namespace Valabuild {
 				case "vala":
 				case "vapi":
 					return new Compiler("valac -C", (name) => {
-						string[] inName = name.split(".");
-						var outName = new Gee.ArrayList<string>();
-						foreach(var part in inName[0:(inName.length - 1)]) {
-							outName.add(part);
+						string[] names = name.split(" ");
+						Gee.ArrayList<string> outNames = new Gee.ArrayList<string>();
+						foreach(var name1 in names) {
+							string[] inName = name1.split(".");
+							var outName = new Gee.ArrayList<string>();
+							foreach(var part in inName[0:(inName.length - 1)]) {
+								outName.add(part);
+							}
+							outName.add("c");
+							outNames.add(string.joinv(".", outName.to_array()));
 						}
-						outName.add("c");
-						return string.joinv(".", outName.to_array());
+						return string.joinv(" ", outNames.to_array());
 					}, true);
 				case "c":
 				case "cpp":
@@ -32,15 +37,20 @@ namespace Valabuild {
 				case "m":
 				case "mm":
 				case "mpp":
-					return new Compiler("gcc -c", (name) => {
-						string[] inName = name.split(".");
+				return new Compiler("gcc -c", (name) => {
+					string[] names = name.split(" ");
+					Gee.ArrayList<string> outNames = new Gee.ArrayList<string>();
+					foreach(var name1 in names) {
+						string[] inName = name1.split(".");
 						var outName = new Gee.ArrayList<string>();
 						foreach(var part in inName[0:(inName.length - 1)]) {
 							outName.add(part);
 						}
 						outName.add("o");
-						return string.joinv(".", outName.to_array());
-					}, false);
+						outNames.add(string.joinv(".", outName.to_array()));
+					}
+					return string.joinv(" ", outNames.to_array());
+				}, false);
 				default:
 					return new Compiler("echo Could not find compiler for", (name) => "", false);
 			}

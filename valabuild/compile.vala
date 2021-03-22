@@ -1,4 +1,25 @@
 namespace Valabuild {
+	class Files {
+		public Gee.ArrayList<string> names;
+		public Select.Compiler compiler;
+		public Files(Select.Compiler compiler) {
+			this.compiler = compiler;
+			this.names = new Gee.ArrayList<string>();
+		}
+	}
+	class FileList : Gee.ArrayList<Files> {
+		public static int has(FileList _self, Select.Compiler compiler) {
+			var res = -1;
+			_self.@foreach((files) => {
+				if(compiler.cmd == files.compiler.cmd) {
+					res = _self.index_of(files);
+					return false;
+				}
+				return true;
+			});
+			return res;
+		}
+	}
 	public string compile(string args, string file, Select.Compiler compiler, Console console) throws Error {
 		console.log(file);
 		var res = Posix.system(@"$(compiler.cmd) $args $file");
@@ -9,24 +30,28 @@ namespace Valabuild {
 	}
 	public void compileAll(Gee.ArrayList<string> files, string output_name, Gee.ArrayList<string> pkgs) {
 		var console = new Console("compile");
-		var sorted = new Gee.HashMap<Select.Compiler, Gee.ArrayList<string>>();
+		var sorted = new FileList();
 		var pkg_args = new Gee.ArrayList<string>();
 		foreach(string pkg in pkgs) {
 			pkg_args.add(Util.spawn_stdout("pkg-config --libs --cflags " + pkg));
 		}
 		foreach(string file in files) {
 			var compiler = Select.compiler(file);
-			if(sorted.has_key(compiler)) {
-				sorted.@get(compiler).add(file);
+			var index = FileList.has(sorted, compiler);
+			if(index >= 0) {
+				var files_obj = sorted.@get(index);
+				files_obj.names.add(file);
 			} else {
 				var ar = new Gee.ArrayList<string>();
 				ar.add(file);
-				sorted.@set(compiler, ar);
+				var files_obj = new Files(compiler);
+				files_obj.names = ar;
+				sorted.add(files_obj);
 			}
 		}
 		var output = new Gee.ArrayList<string>();
 		sorted.@foreach((entry) => {
-			var compiler = entry.key;
+			var compiler = entry.compiler;
 			try {
 				var pkg_args_spaced = "";
 				if(compiler.isVala) {
@@ -36,7 +61,7 @@ namespace Valabuild {
 				} else {
 					pkg_args_spaced = string.joinv(" ", pkg_args.to_array()).replace("\n", "");
 				}
-				output.add(compile(pkg_args_spaced, string.joinv(" ", entry.value.to_array()), compiler, console));
+				output.add(compile(pkg_args_spaced, string.joinv(" ", entry.names.to_array()), compiler, console));
 			} catch(Error e) {
 				console.error("Compilation failed.");
 				Posix.exit(1);
@@ -44,7 +69,7 @@ namespace Valabuild {
 			return true;
 		});
 		var out_array = output.to_array();
-		console.log(@"LD " + output_name);
+		console.log(@"LD " + output_name + " <- " + @"gcc $(string.joinv(" ", pkg_args.to_array()).replace("\n", "")) -o " + output_name + " " + string.joinv(" ", out_array));
 		Posix.system(@"gcc $(string.joinv(" ", pkg_args.to_array()).replace("\n", "")) -o " + output_name + " " + string.joinv(" ", out_array));
 	}
 }
