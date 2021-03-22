@@ -69,7 +69,7 @@ namespace Valabuild {
 			return true;
 		});
 		var out_array = output.to_array();
-		console.log(@"LD " + output_name + " <- " + @"gcc $(string.joinv(" ", pkg_args.to_array()).replace("\n", "")) -o " + output_name + " " + string.joinv(" ", out_array));
+		console.log(@"LD " + output_name);
 		Posix.system(@"gcc $(string.joinv(" ", pkg_args.to_array()).replace("\n", "")) -o " + output_name + " " + string.joinv(" ", out_array));
 	}
 }
