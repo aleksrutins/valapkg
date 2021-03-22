@@ -40,7 +40,7 @@ namespace Valabuild {
 						}
 						outName.add("o");
 						return string.joinv(".", outName.to_array());
-					}, true);
+					}, false);
 				default:
 					return new Compiler("echo Could not find compiler for", (name) => "", false);
 			}

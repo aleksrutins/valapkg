@@ -33,6 +33,8 @@ namespace Valabuild {
 					foreach(string pkg in pkgs) {
 						pkg_args_spaced += " --pkg=" + pkg;
 					}
+				} else {
+					pkg_args_spaced = string.joinv(" ", pkg_args.to_array()).replace("\n", "");
 				}
 				output.add(compile(pkg_args_spaced, string.joinv(" ", entry.value.to_array()), compiler, console));
 			} catch(Error e) {
