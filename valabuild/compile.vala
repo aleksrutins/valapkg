@@ -1,12 +1,19 @@
 namespace Valabuild {
-	public string compile(string file, Select.Compiler compiler, Console console) {
+	public string compile(string args, string file, Select.Compiler compiler, Console console) throws Error {
 		console.log(file);
-		Posix.system(@"$(compiler.cmd) $file");
+		var res = Posix.system(@"$(compiler.cmd) $args $file");
+		if(res != 0) {
+			throw new Error(Quark.from_string("compile"), res, "Failed compilation");
+		}
 		return compiler.outRule(file);
 	}
-	public void compileAll(Gee.ArrayList<string> files, string output_name) {
+	public void compileAll(Gee.ArrayList<string> files, string output_name, Gee.ArrayList<string> pkgs) {
 		var console = new Console("compile");
 		var sorted = new Gee.HashMap<Select.Compiler, Gee.ArrayList<string>>();
+		var pkg_args = new Gee.ArrayList<string>();
+		foreach(string pkg in pkgs) {
+			pkg_args.add(Util.spawn_stdout("pkg-config --libs --cflags " + pkg));
+		}
 		foreach(string file in files) {
 			var compiler = Select.compiler(file);
 			if(sorted.has_key(compiler)) {
@@ -20,30 +27,22 @@ namespace Valabuild {
 		var output = new Gee.ArrayList<string>();
 		sorted.@foreach((entry) => {
 			var compiler = entry.key;
-			entry.value.@foreach((file) => {
-				output.add(compile(file, compiler, console));
-				return true;
-			});
+			try {
+				var pkg_args_spaced = "";
+				if(compiler.isVala) {
+					foreach(string pkg in pkgs) {
+						pkg_args_spaced += " --pkg=" + pkg;
+					}
+				}
+				output.add(compile(pkg_args_spaced, string.joinv(" ", entry.value.to_array()), compiler, console));
+			} catch(Error e) {
+				console.error("Compilation failed.");
+				Posix.exit(1);
+			}
 			return true;
 		});
 		var out_array = output.to_array();
-		var vala_files = new Gee.HashMap<int, string>();
-		for(int i = 0; i < out_array.length; i++) {
-			var parts = out_array[i].split(".");
-			if(parts[1] == "c") { // Compiled to C
-				console.log("Vala file: " + out_array[i]);
-				vala_files.@set(i, out_array[i]);
-			}
-		}
-		vala_files.@foreach((entry) => {
-			compile(entry.value, new Select.Compiler("gcc -c", (f) => ""), console);
-			var parts = entry.value.split(".");
-			parts[parts.length - 1] = "o";
-			output.@set(entry.key, string.joinv(".", parts));
-			return true;
-		});
-		out_array = output.to_array();
-		console.log("LD " + string.joinv(" ", out_array) + " -> " + output_name);
-		Posix.system("gcc -o " + output_name + " " + string.joinv(" ", out_array));
+		console.log(@"LD " + output_name);
+		Posix.system(@"gcc $(string.joinv(" ", pkg_args.to_array()).replace("\n", "")) -o " + output_name + " " + string.joinv(" ", out_array));
 	}
 }

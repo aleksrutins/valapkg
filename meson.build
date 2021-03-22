@@ -10,4 +10,14 @@ dependencies = [
     meson.get_compiler('vala').find_library('posix')
 ]
 
-executable('valapkg', ['main.vala', 'init-cmd.vala', 'console.vala', 'package.vala', 'add-cmd.vala', 'build-cmd.vala', 'valabuild/compile.vala', 'valabuild/select.vala', 'buildconf.vala'], dependencies : dependencies, install : true)
+executable('valapkg', [
+    'main.vala',
+    'init-cmd.vala', 
+    'console.vala', 
+    'package.vala', 
+    'add-cmd.vala', 
+    'build-cmd.vala', 
+    'valabuild/compile.vala', 
+    'valabuild/select.vala',
+    'util.vala'
+    ], dependencies : dependencies, install : true)

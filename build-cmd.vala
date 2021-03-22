@@ -7,7 +7,6 @@ void buildProject() {
 	}
 	console.log("Reading build configuration");
 	var buildConf = curPkg.get_object().get_member("build");
-	BuildConf buildConfObj = (BuildConf)Json.gobject_deserialize(typeof(BuildConf), buildConf);
 	console.log("Fetching files from dependencies");
 	var files = new Gee.ArrayList<string>();
 	var deps = curPkg.get_object().get_array_member("dependencies");
@@ -21,18 +20,21 @@ void buildProject() {
 			return;
 		}
 		pkg.get_object().get_object_member("build").get_array_member("files").foreach_element((_arr, _ind, el2) => {
-			console.log("Add file: " + el2.get_string());
 			files.add("modules/" + el.get_string().split("/")[1] + "/" + el2.get_string());
 		});
 	});
 	buildConf.get_object().get_array_member("files").foreach_element((_arr, _ind, file) => {
-		console.log("Add file: " + file.get_string());
 		files.add(file.get_string());
 	});
 	buildConf.get_object().get_array_member("targets").get_object_element(0).get_array_member("files").foreach_element((_arr, _ind, file) => {
-		console.log("Add file: " + file.get_string());
 		files.add(file.get_string());
 	});
-	console.log("Files: " + string.joinv(" ", files.to_array()));
-	Valabuild.compileAll(files, buildConf.get_object().get_array_member("targets").get_object_element(0).get_string_member("name"));
+	var pkgs = new Gee.ArrayList<string>();
+	if(buildConf.get_object().has_member("pkgs")) {
+		var pkgs_json = buildConf.get_object().get_array_member("pkgs");
+		pkgs_json.foreach_element((_arr, _ind, pkg) => {
+			pkgs.add(pkg.get_string());
+		});
+	}
+	Valabuild.compileAll(files, buildConf.get_object().get_array_member("targets").get_object_element(0).get_string_member("name"), pkgs);
 }

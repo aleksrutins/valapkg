@@ -1,12 +1,14 @@
 namespace Valabuild {
 	public class Select {
-		public static delegate string CompilerOutput(string filename);
+		public delegate string CompilerOutput(string filename);
 		public class Compiler {
 			public string cmd;
 			public CompilerOutput outRule;
-			public Compiler(string cmd, CompilerOutput outRule) {
+			public bool isVala;
+			public Compiler(string cmd, CompilerOutput outRule, bool isVala) {
 				this.cmd = cmd;
 				this.outRule = outRule;
+				this.isVala = isVala;
 			}
 		}
 		public static Compiler compiler(string filename) {
@@ -22,7 +24,7 @@ namespace Valabuild {
 						}
 						outName.add("c");
 						return string.joinv(".", outName.to_array());
-					});
+					}, true);
 				case "c":
 				case "cpp":
 				case "cxx":
@@ -38,9 +40,9 @@ namespace Valabuild {
 						}
 						outName.add("o");
 						return string.joinv(".", outName.to_array());
-					});
+					}, true);
 				default:
-					return new Compiler("echo Could not find compiler for", (name) => "");
+					return new Compiler("echo Could not find compiler for", (name) => "", false);
 			}
 		}
 	}
