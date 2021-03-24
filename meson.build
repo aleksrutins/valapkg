@@ -1,6 +1,7 @@
 project('valapkg', 'c', 'vala')
 
 dependencies = [
+    dependency('threads'),
     dependency('gobject-2.0'),
     dependency('glib-2.0'),
     dependency('gio-2.0'),
@@ -13,11 +14,14 @@ dependencies = [
 executable('valapkg', [
     'main.vala',
     'init-cmd.vala', 
-    'console.vala', 
+    'console/console.vala',
+    'console/spinner.vala',
     'package.vala', 
     'add-cmd.vala', 
     'build-cmd.vala', 
     'valabuild/compile.vala', 
     'valabuild/select.vala',
-    'util.vala'
+    'util.vala',
+    'remove.vala',
+    'getcwd.c'
     ], dependencies : dependencies, install : true)

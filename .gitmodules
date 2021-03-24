@@ -1,0 +1,3 @@
+[submodule "console"]
+	path = console
+	url = git://github.com/aleksrutins/vala-console

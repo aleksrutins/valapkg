@@ -1,3 +1,4 @@
+using ValaConsole;
 namespace Package {
     Json.Node get_current() throws Error {
         var parser = new Json.Parser();
@@ -16,23 +17,23 @@ namespace Package {
         os.close();
     }
     string install(string name) {
-        bool use_branch = false;
         string branch = "master";
         string repo = name;
         string pkg_name = "";
-        Json.Node pkg_json = null;
         var console = new Console("package/install");
         if(name.contains("@")) { 
             branch = name.split("@")[1];
-            console.log(@"Branch: $branch");
             repo = name.split("@")[0];
-            console.log(@"Repo: $repo");
         }
         pkg_name = repo.split("/")[1];
-        console.log(@"Package name: $pkg_name");
         Posix.system("mkdir -p modules");
-        console.log(@"Running: git submodule add -b $branch git://github.com/$repo.git modules/$pkg_name");
-        Posix.system(@"git submodule add -b $branch git://github.com/$repo.git modules/$pkg_name");
+        try {
+            var sp = Spinner.createAndStart(@"Cloning repository $repo...", @"Cloned $repo in modules/$pkg_name.");
+            Util.spawn_stdout_v("git", "submodule", "add", "-b", branch, @"git://github.com/$repo.git", @"modules/$pkg_name");
+            sp.stop();
+        } catch (Error e) {
+            console.error("An error occured when cloning. Please make sure the repo exists and you have Git installed.");
+        }
         return pkg_name;
     }
 }

@@ -1,3 +1,4 @@
+using ValaConsole;
 void init() {
     var console = new Console("init");
     var projectName = console.question("Name");
@@ -14,9 +15,6 @@ void init() {
     pkg_builder.add_string_value(author);
     pkg_builder.set_member_name("website");
     pkg_builder.add_string_value(website);
-    pkg_builder.set_member_name("dependencies");
-    pkg_builder.begin_array();
-    pkg_builder.end_array();
     pkg_builder.end_object();
 
     var generator = new Json.Generator();

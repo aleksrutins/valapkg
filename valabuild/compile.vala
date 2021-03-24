@@ -1,3 +1,4 @@
+using ValaConsole;
 namespace Valabuild {
 	class Files {
 		public Gee.ArrayList<string> names;
@@ -21,8 +22,9 @@ namespace Valabuild {
 		}
 	}
 	public string compile(string args, string file, Select.Compiler compiler, Console console) throws Error {
-		console.log(file);
+		var sp = Spinner.createAndStart(@"Compiling with $(compiler.cmd)...", @"Compiled $file");
 		var res = Posix.system(@"$(compiler.cmd) $args $file");
+		sp.stop();
 		if(res != 0) {
 			throw new Error(Quark.from_string("compile"), res, "Failed compilation");
 		}
@@ -69,7 +71,8 @@ namespace Valabuild {
 			return true;
 		});
 		var out_array = output.to_array();
-		console.log(@"LD " + output_name);
+		var sp = Spinner.createAndStart(@"Linking $output_name...", @"Linked $output_name");
 		Posix.system(@"gcc $(string.joinv(" ", pkg_args.to_array()).replace("\n", "")) -o " + output_name + " " + string.joinv(" ", out_array));
+		sp.stop();
 	}
 }
