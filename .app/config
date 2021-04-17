@@ -1,0 +1,39 @@
+# Name to be shown in confirmation prompt
+name = "valapkg";
+# Doesn't do anything yet
+author = "Aleks Rutins";
+
+# Shown if something goes wrong
+notify_dev_depends = ("Meson", "Ninja", "C", "Vala");
+notify_depends = ("gobject-2.0", "glib-2.0", "gio-2.0", "libsoup-2.4", "json-glib-1.0", "gee-0.8", "pthread", "posix");
+# `app`-based packages to be installed first.
+depends = ();
+dev_depends = ();
+
+# A list of scripts for build and install.
+scripts:
+(
+    {
+        # Name of the script
+        name = "configure";
+        # Commands
+        commands = ("rm -rf builddir", "meson builddir");
+    },
+    {
+        name = "build";
+        commands = ("ninja -C builddir");
+    }
+);
+
+# $prefix is the install root
+install = ("DESTDIR=$prefix ninja -C builddir install");
+
+# Binaries (and other files) to symlink
+files = (
+    {
+        # Path to symlink to (with / being ~/.local/)
+        install_path = "/bin/valapkg";
+        # Path to the file in the install root (with / being the install root)
+        pkg_path = "/usr/local/bin/valapkg";
+    }
+);

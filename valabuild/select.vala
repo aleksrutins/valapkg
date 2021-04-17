@@ -28,7 +28,7 @@ namespace Valabuild {
 							outName.add("c");
 							outNames.add(string.joinv(".", outName.to_array()));
 						}
-						return string.joinv(" ", outNames.to_array());
+						return "_build/" + string.joinv(" ", outNames.to_array());
 					}, true);
 				case "c":
 				case "cpp":

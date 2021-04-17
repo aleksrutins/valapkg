@@ -24,7 +24,8 @@ namespace Valabuild {
 	public string compile(string args, string file, Select.Compiler compiler, Console console) throws Error {
 		var sp = Spinner.createAndStart(@"Compiling with $(compiler.cmd)...", @"Compiled $file");
 		var res = Posix.system(@"$(compiler.cmd) $args $file");
-		sp.stop();
+		if(res == 0) sp.stop(@"Compiled $file");
+		else sp.stop("Failed compilation", true);
 		if(res != 0) {
 			throw new Error(Quark.from_string("compile"), res, "Failed compilation");
 		}
@@ -65,14 +66,13 @@ namespace Valabuild {
 				}
 				output.add(compile(pkg_args_spaced, string.joinv(" ", entry.names.to_array()), compiler, console));
 			} catch(Error e) {
-				console.error("Compilation failed.");
 				Posix.exit(1);
 			}
 			return true;
 		});
 		var out_array = output.to_array();
-		var sp = Spinner.createAndStart(@"Linking $output_name...", @"Linked $output_name");
+		var sp = Spinner.createAndStart(@"Linking $output_name...");
 		Posix.system(@"gcc $(string.joinv(" ", pkg_args.to_array()).replace("\n", "")) -o " + output_name + " " + string.joinv(" ", out_array));
-		sp.stop();
+		sp.stop(@"Linked $(string.joinv(" ", out_array)) \u2192 $output_name");
 	}
 }

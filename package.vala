@@ -28,9 +28,9 @@ namespace Package {
         pkg_name = repo.split("/")[1];
         Posix.system("mkdir -p modules");
         try {
-            var sp = Spinner.createAndStart(@"Cloning repository $repo...", @"Cloned $repo in modules/$pkg_name.");
+            var sp = Spinner.createAndStart(@"Cloning repository $repo...");
             Util.spawn_stdout_v("git", "submodule", "add", "-b", branch, @"git://github.com/$repo.git", @"modules/$pkg_name");
-            sp.stop();
+            sp.stop(@"Cloned $repo in modules/$pkg_name.");
         } catch (Error e) {
             console.error("An error occured when cloning. Please make sure the repo exists and you have Git installed.");
         }
