@@ -9,6 +9,8 @@ void init() {
     var pkg_builder = new Json.Builder();
 
     pkg_builder.begin_object();
+    pkg_builder.set_member_name("$schema");
+    pkg_builder.add_string_value("https://aleks.rutins.com/projects/valapkg/project.schema.json");
     pkg_builder.set_member_name("name");
     pkg_builder.add_string_value(projectName);
     pkg_builder.set_member_name("author");
@@ -29,7 +31,7 @@ void init() {
         console.error("Exiting");
         return;
     }
-    console.log("Writing package.json");
+    console.enumerate("Writing package.json");
     try {
         Package.write(pkg_builder.get_root());
 	} catch (Error e) {
@@ -37,12 +39,12 @@ void init() {
         return;
 	}
     try {
-        console.log("Initializing with Git");
+        console.enumerate("Initializing with Git");
         Util.spawn_stdout("git init");
         Util.spawn_stdout("git add -A");
-        console.log("Creating initial commit");
+        console.enumerate("Creating initial commit");
         Util.spawn_stdout_v("git", "commit", "-m", "Initial commit");
-        console.log("Initializing for submodules");
+        console.enumerate("Initializing for submodules");
         Util.spawn_stdout("git submodule init");
         console.log("Done!");
     } catch(Error e) {

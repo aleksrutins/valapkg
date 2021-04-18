@@ -72,7 +72,11 @@ namespace Valabuild {
 		});
 		var out_array = output.to_array();
 		var sp = Spinner.createAndStart(@"Linking $output_name...");
-		Posix.system(@"gcc $(string.joinv(" ", pkg_args.to_array()).replace("\n", "")) -o " + output_name + " " + string.joinv(" ", out_array));
-		sp.stop(@"Linked $(string.joinv(" ", out_array)) \u2192 $output_name");
+		var res = Posix.system(@"gcc $(string.joinv(" ", pkg_args.to_array()).replace("\n", "")) -o " + output_name + " " + string.joinv(" ", out_array));
+		if(res != 0) {
+			sp.stop(@"Failed to link $(string.joinv(" ", out_array)) \u2192 $output_name", true);
+		} else {
+			sp.stop(@"Linked $(string.joinv(" ", out_array)) \u2192 $output_name");
+		}
 	}
 }
