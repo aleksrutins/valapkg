@@ -37,25 +37,10 @@ jobs:
         run: |
           meson builddir
           ninja -C builddir
-      
-      - name: Create Release
-  # You may pin to the exact commit or the version.
-  # uses: ncipollo/release-action@7c5046364401a3e122086927d07617a3d756b658
-        uses: ncipollo/release-action@v1.8.4
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v2.2.3
         with:
-          # An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs)
-          artifact: builddir/valapkg
-          # An optional body for the release.
-          body: |
-            Actions release
-            Dependencies (pkg-config names):
-            - gobject-2.0
-            - glib-2.0
-            - gio-2.0
-            - libsoup-2.4
-            - json-glib-1.0
-            - gee-0.8
-          # Optionally marks this release as a draft release. Set to true to enable.
-          draft: true
-          # The Github token.
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # Artifact name
+          name: output
+          # A file, directory or wildcard pattern that describes what to upload
+          path: builddir/valapkg
