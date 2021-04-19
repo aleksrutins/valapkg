@@ -1,0 +1,58 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Install dependencies
+      - name: Install apt-get dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install pkg-config libglib2.0-dev libsoup2.4-dev libjson-glib-dev libgee-0.8-dev valac meson
+      - name: Build
+        run: |
+          meson builddir
+          ninja -C builddir
+      
+      - name: Create Release
+  # You may pin to the exact commit or the version.
+  # uses: ncipollo/release-action@7c5046364401a3e122086927d07617a3d756b658
+      - uses: ncipollo/release-action@v1.8.4
+        with:
+          # An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs)
+          artifact: builddir/valapkg
+          # An optional body for the release.
+          body: |
+            Actions release
+            Dependencies (pkg-config names):
+            - gobject-2.0
+            - glib-2.0
+            - gio-2.0
+            - libsoup-2.4
+            - json-glib-1.0
+            - gee-0.8
+          # Optionally marks this release as a draft release. Set to true to enable.
+          draft: true
+          # The Github token.
+          token: ${{ secrets.GITHUB_TOKEN }}
