@@ -27,7 +27,6 @@ namespace Valabuild {
 		cargs.add_all(new Gee.ArrayList<string>.wrap(compiler.cmd.split(" ")));
 		cargs.add_all(new Gee.ArrayList<string>.wrap(args.split(" ")));
 		cargs.add_all(new Gee.ArrayList<string>.wrap(file.split(" ")));
-		cargs.add((string)0);
 		for(int i = 0; i < cargs.size; i++) {
 			if(cargs.@get(i) == " " || cargs.@get(i) == "") {
 				cargs.remove_at(i);
@@ -94,7 +93,6 @@ namespace Valabuild {
 				}
 				output.add_all(new Gee.ArrayList<string>.wrap(compile(pkg_args_spaced, string.joinv(" ", entry.names.to_array()), compiler, console).replace("\n", "").split(" ")));
 			} catch(Error e) {
-				print(@"\033[1;31m$(e.message)\033[0m]\n");
 				Posix.exit(1);
 			}
 			return true;

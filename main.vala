@@ -9,7 +9,7 @@ int main(string[] args) {
             addPackage(args[2]);
             break;
         case "remove":
-            remove(args[2]);
+            remove_package(args[2]);
             break;
         case "build":
             buildProject();

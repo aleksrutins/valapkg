@@ -7,7 +7,7 @@ void addPackage(string name) {
     var new_pkgJson = File.new_for_path(@"modules/$pkg_name/package.json");
     if(!new_pkgJson.query_exists()) {
         console.error("package.json not found, removing from dependencies");
-        remove(pkg_name);
+        remove_package(pkg_name);
     }
     return;
 }

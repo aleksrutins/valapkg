@@ -1,4 +1,5 @@
 project('valapkg', 'c', 'vala')
+subdir('vala-console')
 
 dependencies = [
     dependency('threads'),
@@ -13,9 +14,7 @@ dependencies = [
 
 executable('valapkg', [
     'main.vala',
-    'init-cmd.vala', 
-    'console/console.vala',
-    'console/spinner.vala',
+    'init-cmd.vala',
     'package.vala', 
     'add-cmd.vala', 
     'build-cmd.vala', 
@@ -24,4 +23,4 @@ executable('valapkg', [
     'util.vala',
     'remove.vala',
     'getcwd.c'
-    ], dependencies : dependencies, install : true)
+    ] + vala_console_SOURCES, dependencies : dependencies, install : true)
