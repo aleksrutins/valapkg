@@ -56,8 +56,6 @@ jobs:
           # Artifact name
           name: output
           path: output
-      - name: Rename artifact
-        run: mv output/output output/valapkg
       - name: Create Release
 # You may pin to the exact commit or the version.
 # uses: ncipollo/release-action@7c5046364401a3e122086927d07617a3d756b658
