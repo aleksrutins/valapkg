@@ -21,7 +21,7 @@ namespace Valabuild {
 			return res;
 		}
 	}
-	public string compile(string args, string file, Select.Compiler compiler, Console console) throws Error {
+	public string compile(string args, string file, Select.Compiler compiler, Console console, string log_file_name) throws Error {
 		var sp = Spinner.createAndStart(@"Compiling with $(compiler.cmd)...", @"Compiled $file");
 		var cargs = new Gee.ArrayList<string>();
 		cargs.add_all(new Gee.ArrayList<string>.wrap(compiler.cmd.split(" ")));
@@ -37,7 +37,7 @@ namespace Valabuild {
 		if(compile_output.status == 0) sp.stop(@"Compiled with $(compiler.cmd)");
 		else sp.stop("Failed compilation", true);
 		if(compile_output.stderr.length > 0 || compile_output.stdout.length > 0) {
-			var log = File.new_for_path("compile.log");
+			var log = File.new_for_path(log_file_name);
 			try {
 				log.@delete();
 			} catch(Error e) {
@@ -50,7 +50,7 @@ namespace Valabuild {
 				os.write_all("\nSTDERR\n------\n".data,                out out_bytes);
 				os.write_all(compile_output.stderr.data,               out out_bytes);
 			} finally {try {os.close();} catch(Error e) {}}
-			print("\033[33mOutput has been written to \033[1mcompile.log\033[0;33m.\033[0m\n");
+			print(@"\033[33mOutput has been written to \033[1m$log_file_name\033[0;33m.\033[0m\n");
 		}
 		if(compile_output.status != 0) {
 			throw new Error(Quark.from_string("compile"), compile_output.status, "Failed compilation");
@@ -81,6 +81,7 @@ namespace Valabuild {
 			}
 		}
 		var output = new Gee.ArrayList<string>();
+		int compile_log_id = 0;
 		sorted.@foreach((entry) => {
 			var compiler = entry.compiler;
 			try {
@@ -92,21 +93,21 @@ namespace Valabuild {
 				} else {
 					pkg_args_spaced = string.joinv(" ", pkg_args.to_array()).replace("\n", "");
 				}
-				output.add_all(new Gee.ArrayList<string>.wrap(compile(pkg_args_spaced, string.joinv(" ", entry.names.to_array()), compiler, console).replace("\n", "").split(" ")));
+				output.add_all(new Gee.ArrayList<string>.wrap(compile(pkg_args_spaced, string.joinv(" ", entry.names.to_array()), compiler, console, @"compile.$output_name.$compile_log_id.log").replace("\n", "").split(" ")));
 			} catch(Error e) {
 				print(@"\033[1;31m$(e.message)\033[0m]\n");
 				Posix.exit(1);
 			}
+			compile_log_id++;
 			return true;
 		});
 		var out_array = output.to_array();
 		var sp = Spinner.createAndStart(@"Linking $output_name...");
 		Util.Output link_output = Util.Output();
-		var log = File.new_for_path("link.log");
+		var log = File.new_for_path(@"link.$output_name.log");
 		try {
 			log.@delete();
 		} catch(Error e) {
-			print("\nError deleting log\n\n\n");
 		} finally {}
 		FileOutputStream os = log.create(FileCreateFlags.PRIVATE);
 		try {
@@ -133,7 +134,7 @@ namespace Valabuild {
 				os.write_all(link_output.stderr.data,                  out out_bytes);
 				os.write_all("\nResult: Compilation SUCCEEDED\n".data, out out_bytes);
 				os.close();
-				print("\033[33mOutput has been written to \033[1mlink.log\033[0;33m.\033[0m\n");
+				print(@"\033[33mOutput has been written to \033[1mlink.$output_name.log\033[0;33m.\033[0m\n");
 			}
 		} catch(Error e) {
 			sp.stop(@"Failed to link $output_name", true);
@@ -146,7 +147,7 @@ namespace Valabuild {
 					os.write_all(link_output.stderr.data,               out out_bytes);
 					os.write_all("\nResult: Compilation FAILED\n".data, out out_bytes);
 					os.close();
-					print("\033[1;31mOutput has been written to \033[1mlink.log\033[0;33m.\033[0m\n");
+					print(@"\033[1;31mOutput has been written to \033[1mlink.$output_name.log\033[0;33m.\033[0m\n");
 				} else {
 					print("\033[1;31mNo output.\033[0m\n");
 				}
