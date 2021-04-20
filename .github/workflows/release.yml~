@@ -14,11 +14,38 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Update submodules
+        run: git submodule update --init
+
+      # Install dependencies
+      - name: Install apt-get dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install pkg-config libglib2.0-dev libsoup2.4-dev libjson-glib-dev libgee-0.8-dev valac meson
+      - name: Build
+        run: |
+          meson builddir
+          ninja -C builddir
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v2.2.3
+        with:
+          # Artifact name
+          name: output
+          # A file, directory or wildcard pattern that describes what to upload
+          path: builddir/valapkg
+  upload:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    needs: build
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
