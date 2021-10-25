@@ -1,5 +1,5 @@
 name: valapkg # you probably want to 'snapcraft register <name>'
-base: core20 # the base snap is the execution environment for this snap
+base: core21 # the base snap is the execution environment for this snap
 version: 'latest' # just for humans, typically '1.2+git' or '1.3.2'
 summary: A package manager for Vala projects. # 79 char long summary
 description: |
@@ -18,5 +18,5 @@ parts:
     # See 'snapcraft plugins'
     plugin: meson
     source: '.'
-    build-packages: [pkg-config, libglib2.0-dev, libsoup2.4-dev, libjson-glib-dev, glib-networking, valac]
-    stage-packages: [libglib2.0-0, libsoup2.4-1, libjson-glib-1.0-0, glib-networking, git]
+    build-packages: [pkg-config, libglib2.0-dev, libsoup2.4-dev, libjson-glib-dev, libgee-0.8-dev, glib-networking, valac]
+    stage-packages: [libglib2.0-0, libsoup2.4-1, libjson-glib-1.0-0, libgee-0.8-2, glib-networking, git]
