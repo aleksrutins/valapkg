@@ -1,5 +1,5 @@
 name: valapkg # you probably want to 'snapcraft register <name>'
-base: core21 # the base snap is the execution environment for this snap
+base: core20 # the base snap is the execution environment for this snap
 version: 'latest' # just for humans, typically '1.2+git' or '1.3.2'
 summary: A package manager for Vala projects. # 79 char long summary
 description: |
