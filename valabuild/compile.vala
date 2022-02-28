@@ -63,8 +63,12 @@ namespace Valabuild {
 		var pkgs = new Gee.HashSet<string>();
 		base_pkgs.@foreach(pkg => pkgs.add(pkg));
 		var pkg_args = new Gee.ArrayList<string>();
-		foreach(string pkg in pkgs) {
-			pkg_args.add_all(new Gee.ArrayList<string>.wrap(Util.spawn_stdout("pkg-config --libs --cflags " + pkg).stdout.replace("\n", "").split(" ")));
+		try {
+			foreach(string pkg in pkgs) {
+				pkg_args.add_all(new Gee.ArrayList<string>.wrap(Util.spawn_stdout("pkg-config --libs --cflags " + pkg).stdout.replace("\n", "").split(" ")));
+			}
+		} catch(Error e) {
+			console.error("Error running pkg-config");
 		}
 		foreach(string file in files) {
 			var compiler = Select.compiler(file);
@@ -109,56 +113,62 @@ namespace Valabuild {
 			log.@delete();
 		} catch(Error e) {
 		} finally {}
-		FileOutputStream os = log.create(FileCreateFlags.PRIVATE);
 		try {
-			var args = new Gee.ArrayList<string>();
-			args.add("gcc");
-			args.add_all(pkg_args);
-			args.add("-o");
-			args.add(output_name);
-			args.add_all(new Gee.ArrayList<string>.wrap(out_array));
-			args.add((string)0);
-			for(int i = 0; i < args.size; i++) {
-				if(args.@get(i) == " " || args.@get(i) == "") args.remove_at(i);
-			}
-			link_output = Util.spawn_stdout_args(args.to_array());
-			if(link_output.status != 0) {
-				throw new Error(Quark.from_string("compile"), link_output.status, "Failed to link");
-			}
-			sp.stop(@"Linked $output_name");
-			if(link_output.stderr.length > 0 || link_output.stdout.length > 0) {
-				size_t out_bytes;
-				os.write_all("STDOUT\n------\n".data,                  out out_bytes);
-				os.write_all(link_output.stdout.data,                  out out_bytes);
-				os.write_all("\nSTDERR\n------\n".data,                out out_bytes);
-				os.write_all(link_output.stderr.data,                  out out_bytes);
-				os.write_all("\nResult: Compilation SUCCEEDED\n".data, out out_bytes);
-				os.close();
-				print(@"\033[33mOutput has been written to \033[1mlink.$output_name.log\033[0;33m.\033[0m\n");
-			}
-		} catch(Error e) {
-			sp.stop(@"Failed to link $output_name", true);
-			if(link_output.stdout != null && link_output.stderr != null) {
+			FileOutputStream os = log.create(FileCreateFlags.PRIVATE);
+			try {
+				var args = new Gee.ArrayList<string>();
+				args.add("gcc");
+				args.add_all(pkg_args);
+				args.add("-o");
+				args.add(output_name);
+				args.add_all(new Gee.ArrayList<string>.wrap(out_array));
+				args.add((string)0);
+				for(int i = 0; i < args.size; i++) {
+					if(args.@get(i) == " " || args.@get(i) == "") args.remove_at(i);
+				}
+				link_output = Util.spawn_stdout_args(args.to_array());
+				if(link_output.status != 0) {
+					throw new Error(Quark.from_string("compile"), link_output.status, "Failed to link");
+				}
+				sp.stop(@"Linked $output_name");
 				if(link_output.stderr.length > 0 || link_output.stdout.length > 0) {
 					size_t out_bytes;
-					os.write_all("STDOUT\n------\n".data,               out out_bytes);
-					os.write_all(link_output.stdout.data,               out out_bytes);
-					os.write_all("\nSTDERR\n------\n".data,             out out_bytes);
-					os.write_all(link_output.stderr.data,               out out_bytes);
-					os.write_all("\nResult: Compilation FAILED\n".data, out out_bytes);
+					os.write_all("STDOUT\n------\n".data,                  out out_bytes);
+					os.write_all(link_output.stdout.data,                  out out_bytes);
+					os.write_all("\nSTDERR\n------\n".data,                out out_bytes);
+					os.write_all(link_output.stderr.data,                  out out_bytes);
+					os.write_all("\nResult: Compilation SUCCEEDED\n".data, out out_bytes);
 					os.close();
-					print(@"\033[1;31mOutput has been written to \033[1mlink.$output_name.log\033[0;33m.\033[0m\n");
-				} else {
-					print("\033[1;31mNo output.\033[0m\n");
+					print(@"\033[33mOutput has been written to \033[1mlink.$output_name.log\033[0;33m.\033[0m\n");
 				}
-			} else {
-				print("\033[1;31mProcess spawn failed\033[0m\n");
-				print(e.message + "\n");
+			} catch(Error e) {
+				sp.stop(@"Failed to link $output_name", true);
+				if(link_output.stdout != null && link_output.stderr != null) {
+					if(link_output.stderr.length > 0 || link_output.stdout.length > 0) {
+						try {
+							size_t out_bytes;
+							os.write_all("STDOUT\n------\n".data,               out out_bytes);
+							os.write_all(link_output.stdout.data,               out out_bytes);
+							os.write_all("\nSTDERR\n------\n".data,             out out_bytes);
+							os.write_all(link_output.stderr.data,               out out_bytes);
+							os.write_all("\nResult: Compilation FAILED\n".data, out out_bytes);
+							os.close();
+							print(@"\033[1;31mOutput has been written to \033[1mlink.$output_name.log\033[0;33m.\033[0m\n");
+						} catch(IOError e) {
+							console.error("Error writing link output");
+						}
+					} else {
+						print("\033[1;31mNo output.\033[0m\n");
+					}
+				} else {
+					print("\033[1;31mProcess spawn failed\033[0m\n");
+					print(e.message + "\n");
+				}
+			} finally {
+				try {
+					os.close();
+				} catch(Error e) {}
 			}
-		} finally {
-			try {
-				os.close();
-			} catch(Error e) {} finally {}
-		}
+		} catch(Error e) {}
 	}
 }

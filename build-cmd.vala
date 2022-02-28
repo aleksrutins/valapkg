@@ -54,18 +54,22 @@ Building target \033[1m$(target.get_object().get_string_member("name"))\033[0m
 	    iterateDependenciesRecursive((el) => {
 		    var parser = new Json.Parser();
 		    var filename = el + "/package.json";
-		    parser.load_from_file(filename);
-		    var pkg = parser.get_root();
-		    if(!pkg.get_object().has_member("build")) {
-			    console.log(@"No build configuration found for module $(el). Skipping.");
-			    return;
-		    }
-		    if(pkg.get_object().get_object_member("build").has_member("pkgs")) pkg.get_object().get_object_member("build").get_array_member("pkgs").foreach_element((_arr, _ind, el2) => {
-			    pkgs.add(el2.get_string());
-		    });
-		    pkg.get_object().get_object_member("build").get_array_member("files").foreach_element((_arr, _ind, el2) => {
-			    files.add(el + "/" + el2.get_string());
-		    });
+			try {
+				parser.load_from_file(filename);
+				var pkg = parser.get_root();
+				if(!pkg.get_object().has_member("build")) {
+					console.log(@"No build configuration found for module $(el). Skipping.");
+					return;
+				}
+				if(pkg.get_object().get_object_member("build").has_member("pkgs")) pkg.get_object().get_object_member("build").get_array_member("pkgs").foreach_element((_arr, _ind, el2) => {
+					pkgs.add(el2.get_string());
+				});
+				pkg.get_object().get_object_member("build").get_array_member("files").foreach_element((_arr, _ind, el2) => {
+					files.add(el + "/" + el2.get_string());
+				});
+			} catch(Error e) {
+				console.error("Error fetching files from dependencies");
+			}
 	    });
 	    buildConf.get_object().get_array_member("files").foreach_element((_arr, _ind, file) => {
 		    files.add(file.get_string());
