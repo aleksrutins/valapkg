@@ -14,7 +14,6 @@ namespace Util {
     public Output spawn_stdout_args(string[] args) throws Error {
         string[] spawn_env = Environ.get ();
 		Output output = Output();
-		int ls_status;
 
 		Process.spawn_sync (null,
                             args,

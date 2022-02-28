@@ -25,7 +25,7 @@ Gee.ArrayList<string> getDeps() {
 	} catch(Error e) {}
 	return modules;
 }
-void buildProject() {
+void buildProject() throws GLib.Error {
 	var console = new Console("build");
 	var curPkg = Package.get_current();
 	if(!curPkg.get_object().has_member("build")) {
@@ -64,19 +64,25 @@ Building target \033[1m$(target.get_object().get_string_member("name"))\033[0m
 				if(pkg.get_object().get_object_member("build").has_member("pkgs")) pkg.get_object().get_object_member("build").get_array_member("pkgs").foreach_element((_arr, _ind, el2) => {
 					pkgs.add(el2.get_string());
 				});
-				pkg.get_object().get_object_member("build").get_array_member("files").foreach_element((_arr, _ind, el2) => {
-					files.add(el + "/" + el2.get_string());
-				});
+				if(pkg.get_object().get_object_member("build").has_member("files")) {
+					pkg.get_object().get_object_member("build").get_array_member("files").foreach_element((_arr, _ind, el2) => {
+						files.add(el + "/" + el2.get_string());
+					});
+				}
 			} catch(Error e) {
 				console.error("Error fetching files from dependencies");
 			}
 	    });
-	    buildConf.get_object().get_array_member("files").foreach_element((_arr, _ind, file) => {
-		    files.add(file.get_string());
-	    });
-	    target.get_object().get_array_member("files").foreach_element((_arr, _ind, file) => {
-		    files.add(file.get_string());
-	    });
+		if(buildConf.get_object().has_member("files")) {
+			buildConf.get_object().get_array_member("files").foreach_element((_arr, _ind, file) => {
+				files.add(file.get_string());
+			});
+		}
+		if(target.get_object().has_member("files")) {
+			target.get_object().get_array_member("files").foreach_element((_arr, _ind, file) => {
+				files.add(file.get_string());
+			});
+		}
 	    Valabuild.compileAll(files, target.get_object().get_string_member("name"), pkgs);
 	});
 }

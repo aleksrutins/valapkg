@@ -1,6 +1,7 @@
 using Soup;
 
 int main(string[] args) {
+    try {
     switch(args[1]) {
         case "init":
             init();
@@ -15,5 +16,8 @@ int main(string[] args) {
             buildProject();
             break;
     }
+    } catch (Error e) {
+        printerr("An error occurred: %s.", e.message);
+    } 
     return 0;
 }

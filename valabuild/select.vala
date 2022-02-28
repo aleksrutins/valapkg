@@ -3,7 +3,7 @@ namespace Valabuild {
 		public delegate string CompilerOutput(string filename);
 		public class Compiler {
 			public string cmd;
-			public CompilerOutput outRule;
+			public unowned CompilerOutput outRule;
 			public bool isVala;
 			public Compiler(string cmd, CompilerOutput outRule, bool isVala) {
 				this.cmd = cmd;
