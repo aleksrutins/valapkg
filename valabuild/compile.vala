@@ -9,11 +9,11 @@ namespace Valabuild {
 		}
 	}
 	class FileList : Gee.ArrayList<Files> {
-		public static int has(FileList _self, Select.Compiler compiler) {
+		public int indexOfCompiler(Select.Compiler compiler) {
 			var res = -1;
-			_self.@foreach((files) => {
+			this.@foreach((files) => {
 				if(compiler.cmd == files.compiler.cmd) {
-					res = _self.index_of(files);
+					res = this.index_of(files);
 					return false;
 				}
 				return true;
@@ -68,7 +68,7 @@ namespace Valabuild {
 		}
 		foreach(string file in files) {
 			var compiler = Select.compiler(file);
-			var index = FileList.has(sorted, compiler);
+			var index = sorted.indexOfCompiler(compiler);
 			if(index >= 0) {
 				var files_obj = sorted.@get(index);
 				files_obj.names.add(file);
