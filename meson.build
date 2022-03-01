@@ -22,5 +22,6 @@ executable('valapkg', [
     'valabuild/select.vala',
     'util.vala',
     'remove.vala',
-    'getcwd.c'
+    'compile-commands.vala',
+    'getcwd.c',
     ] + vala_console_SOURCES, dependencies : dependencies, install : true)
