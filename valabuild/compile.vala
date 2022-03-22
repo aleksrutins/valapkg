@@ -29,16 +29,15 @@ namespace Valabuild {
 	}
 
 	public CompileResult compile(string args, string file, Select.Compiler compiler, Console console, string log_file_name) throws Error {
-		var message = @"Compiling $file with $(compiler.cmd)...";
 		var files = file.split(" ");
 		var nFiles = files.length;
-		var outNames = compiler.outRule(file);
-		if(nFiles > 1) message = @"Compiling $nFiles files with $(compiler.cmd)";
-		var sp = Spinner.createAndStart(message, @"Compiled $(nFiles > 1 ? @"$nFiles files" : file) with $(compiler.cmd)");
+		var outNames = compiler.outRule(file, "builddir");
+		var cmd_str = compiler.cmd(file, "builddir", outNames, args);
+		var message = @"Compiling $file";
+		if(nFiles > 1) message = @"Compiling $nFiles files";
+		var sp = Spinner.createAndStart(message, @"Compiled $(nFiles > 1 ? @"$nFiles files" : file)");
 		var cargs = new Gee.ArrayList<string>();
-		cargs.add_all(new Gee.ArrayList<string>.wrap(compiler.cmd.split(" ")));
-		cargs.add_all(new Gee.ArrayList<string>.wrap(args.split(" ")));
-		cargs.add_all(new Gee.ArrayList<string>.wrap(files));
+		cargs.add_all(new Gee.ArrayList<string>.wrap(cmd_str.split(" ")));
 		cargs.add((string)0);
 		for(int i = 0; i < cargs.size; i++) {
 			if(cargs.@get(i) == " " || cargs.@get(i) == "") {
