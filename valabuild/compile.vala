@@ -114,14 +114,14 @@ namespace Valabuild {
 						pkg_args_spaced = string.joinv(" ", pkg_args.to_array()).replace("\n", "");
 					}
 					if(compiler.isVala) {
-						var compileResult = compile(pkg_args_spaced, string.joinv(" ", entry.names.to_array()), compiler, console, @"compile.$output_name.$compile_log_id.log");
+						var compileResult = compile(pkg_args_spaced, string.joinv(" ", entry.names.to_array()), compiler, console, @"builddir/compile.$output_name.$compile_log_id.log");
 						var outFromVala = new Gee.ArrayList<string>.wrap(compileResult.outNames.replace("\n", "").split(" "));
 						var sorted = sort(outFromVala);
 						compile_commands.add(compileResult.cmd);
 						intermediates.add_all(sorted);
 					} else {
 						foreach (var name in entry.names) {
-							var result = compile(pkg_args_spaced, name, compiler, console, @"compile.$output_name.$compile_log_id.log");
+							var result = compile(pkg_args_spaced, name, compiler, console, @"builddir/compile.$output_name.$compile_log_id.log");
 							compile_commands.add(result.cmd);
 							output.add_all(new Gee.ArrayList<string>.wrap(result.outNames.replace("\n", "").split(" ")));
 						}
@@ -155,7 +155,7 @@ namespace Valabuild {
 		var out_array = output.to_array();
 		var sp = Spinner.createAndStart(@"Linking $output_name...");
 		Util.Output link_output = Util.Output();
-		var log = File.new_for_path(@"link.$output_name.log");
+		var log = File.new_for_path(@"builddir/link.$output_name.log");
 		try {
 			log.@delete();
 		} catch(Error e) {
@@ -167,7 +167,7 @@ namespace Valabuild {
 				args.add("gcc");
 				args.add_all(pkg_args);
 				args.add("-o");
-				args.add(output_name);
+				args.add("builddir/" + output_name);
 				args.add_all(new Gee.ArrayList<string>.wrap(out_array));
 				args.add((string)0);
 				for(int i = 0; i < args.size; i++) {
@@ -186,7 +186,7 @@ namespace Valabuild {
 					os.write_all(link_output.stderr.data,                  out out_bytes);
 					os.write_all("\nResult: Compilation SUCCEEDED\n".data, out out_bytes);
 					os.close();
-					print(@"\033[33mOutput has been written to \033[1mlink.$output_name.log\033[0;33m.\033[0m\n");
+					print(@"\033[33mOutput has been written to \033[1mbuilddir/link.$output_name.log\033[0;33m.\033[0m\n");
 				}
 			} catch(Error e) {
 				sp.stop(@"Failed to link $output_name", true);

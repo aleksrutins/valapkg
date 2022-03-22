@@ -3,12 +3,13 @@ extern char *vala_getcwd();
 delegate void DependenciesIterator(string dep);
 void iterateDependenciesRecursive(DependenciesIterator cb) {
 	var deps = getDeps();
-	var rootCwd = (string)vala_getcwd();
+	var rootCwd = ".";
+	var actRootCwd = (string)vala_getcwd();
 	deps.@foreach((dep) => {
 		cb(rootCwd + "/modules/" + dep);
 		Posix.chdir("modules/" + dep);
 		iterateDependenciesRecursive(cb);
-		Posix.chdir(rootCwd);
+		Posix.chdir(actRootCwd);
 		return true;
 	});
 }
@@ -94,8 +95,8 @@ Building target \033[1m$(target.get_object().get_string_member("name"))\033[0m
 	    compile_commands.merge(Valabuild.compileAll(files, target.get_object().get_string_member("name"), pkgs));
 	});
 
-	var write_cc = Spinner.createAndStart("Writing compile_commands.json", "Wrote compile_commands.json");
-	var file_cc = File.new_for_path("compile_commands.json");
+	var write_cc = Spinner.createAndStart("Writing builddir/compile_commands.json", "Wrote builddir/compile_commands.json");
+	var file_cc = File.new_for_path("builddir/compile_commands.json");
 	if(file_cc.query_exists()) file_cc.@delete();
 	try {
 		var stream = file_cc.create(PRIVATE);
