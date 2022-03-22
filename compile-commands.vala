@@ -6,6 +6,15 @@ namespace CompileCommands {
         public string[] arguments {get; set;}
         public string file {get; set;}
         public string output {get; set;}
+        public string command {
+            owned get {
+                var arr = new ArrayList<string>();
+                foreach(var arg in arguments) {
+                    arr.add("'" + arg + "'");
+                }
+                return string.joinv(" ", arr.to_array());
+            }
+        }
     }
     public class Builder {
         private LinkedList<Command?> commands = new LinkedList<Command> ();
