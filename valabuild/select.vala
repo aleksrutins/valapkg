@@ -17,6 +17,7 @@ namespace Valabuild {
 			switch(parts[parts.length - 1]) {
 				case "vala":
 				case "vapi":
+				case "gs":
 					return new Compiler((name, output, outNames, flags) => {
 						return @"valac $flags -C $name -d $output";
 					}, (name, output) => {
