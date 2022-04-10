@@ -54,20 +54,8 @@ namespace Valabuild {
 		if(compile_output.status == 0) sp.stop();
 		else sp.stop("Failed compilation", true);
 		if(compile_output.stderr.length > 0 || compile_output.stdout.length > 0) {
-			var log = File.new_for_path(log_file_name);
-			try {
-				log.@delete();
-			} catch(Error e) {
-			} finally {}
-			FileOutputStream os = log.create(FileCreateFlags.PRIVATE);
-			size_t out_bytes;
-			try {
-				os.write_all("STDOUT\n------\n".data,                  out out_bytes);
-				os.write_all(compile_output.stdout.data,               out out_bytes);
-				os.write_all("\nSTDERR\n------\n".data,                out out_bytes);
-				os.write_all(compile_output.stderr.data,               out out_bytes);
-			} finally {try {os.close();} catch(Error e) {}}
-			print(@"\033[33mOutput has been written to \033[1m$log_file_name\033[0;33m.\033[0m\n");
+			print((string)compile_output.stdout.data);
+			print((string)compile_output.stderr.data);
 		}
 		if(compile_output.status != 0) {
 			throw new Error(Quark.from_string("compile"), compile_output.status, "Failed compilation");
@@ -179,14 +167,8 @@ namespace Valabuild {
 				}
 				sp.stop(@"Linked $output_name");
 				if(link_output.stderr.length > 0 || link_output.stdout.length > 0) {
-					size_t out_bytes;
-					os.write_all("STDOUT\n------\n".data,                  out out_bytes);
-					os.write_all(link_output.stdout.data,                  out out_bytes);
-					os.write_all("\nSTDERR\n------\n".data,                out out_bytes);
-					os.write_all(link_output.stderr.data,                  out out_bytes);
-					os.write_all("\nResult: Compilation SUCCEEDED\n".data, out out_bytes);
-					os.close();
-					print(@"\033[33mOutput has been written to \033[1mbuilddir/link.$output_name.log\033[0;33m.\033[0m\n");
+					print((string)link_output.stdout.data);
+					print((string)link_output.stderr.data);
 				}
 			} catch(Error e) {
 				sp.stop(@"Failed to link $output_name", true);
