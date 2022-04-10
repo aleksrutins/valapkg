@@ -1,6 +1,6 @@
 using ValaConsole;
 public void remove_package(string pkg_name) {
-    var sp = Spinner.createAndStart("Removing...");
+    var sp = Spinner.createAndStart("Removing...", "Removed.");
     var console = new Console("remove");
     try {
         Util.spawn_stdout_v("git", "rm", "-f", @"modules/$pkg_name");

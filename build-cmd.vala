@@ -3,12 +3,13 @@ extern char *vala_getcwd();
 delegate void DependenciesIterator(string dep);
 void iterateDependenciesRecursive(DependenciesIterator cb) {
 	var deps = getDeps();
-	var rootCwd = (string)vala_getcwd();
+	var rootCwd = ".";
+	var actRootCwd = (string)vala_getcwd();
 	deps.@foreach((dep) => {
 		cb(rootCwd + "/modules/" + dep);
 		Posix.chdir("modules/" + dep);
 		iterateDependenciesRecursive(cb);
-		Posix.chdir(rootCwd);
+		Posix.chdir(actRootCwd);
 		return true;
 	});
 }
@@ -32,16 +33,21 @@ void buildProject() throws GLib.Error {
 		console.error("No build configuration found.");
 		return;
 	}
+
 	console.log("Reading build configuration");
 	var buildConf = curPkg.get_object().get_member("build");
 	var targets = buildConf.get_object().get_array_member("targets");
 	console.log(@"Targets: \033[1m$(targets.get_length())\033[0m");
+
+	var compile_commands = new CompileCommands.Builder();
+
 	targets.foreach_element((_arr_00, _ind_00, target) => {
 		print(@"
 --------
 Building target \033[1m$(target.get_object().get_string_member("name"))\033[0m
 --------
 ");
+
 	    console.log("Fetching files from dependencies");
 	    var files = new Gee.ArrayList<string>();
 	    var pkgs = new Gee.ArrayList<string>();
@@ -51,6 +57,7 @@ Building target \033[1m$(target.get_object().get_string_member("name"))\033[0m
 			    pkgs.add(pkg.get_string());
 		    });
 	    }
+
 	    iterateDependenciesRecursive((el) => {
 		    var parser = new Json.Parser();
 		    var filename = el + "/package.json";
@@ -73,6 +80,7 @@ Building target \033[1m$(target.get_object().get_string_member("name"))\033[0m
 				console.error("Error fetching files from dependencies");
 			}
 	    });
+
 		if(buildConf.get_object().has_member("files")) {
 			buildConf.get_object().get_array_member("files").foreach_element((_arr, _ind, file) => {
 				files.add(file.get_string());
@@ -83,6 +91,20 @@ Building target \033[1m$(target.get_object().get_string_member("name"))\033[0m
 				files.add(file.get_string());
 			});
 		}
-	    Valabuild.compileAll(files, target.get_object().get_string_member("name"), pkgs);
+
+	    compile_commands.merge(Valabuild.compileAll(files, target.get_object().get_string_member("name"), pkgs));
 	});
+
+	var write_cc = Spinner.createAndStart("Writing builddir/compile_commands.json", "Wrote builddir/compile_commands.json");
+	var file_cc = File.new_for_path("builddir/compile_commands.json");
+	if(file_cc.query_exists()) file_cc.@delete();
+	try {
+		var stream = file_cc.create(PRIVATE);
+		size_t out_bytes;
+		stream.write_all(compile_commands.build().data, out out_bytes);
+		write_cc.stop();
+	} catch (Error e) {
+		write_cc.stop("Failed to write compile_commands.json", true);
+		printerr(e.message);
+	}
 }

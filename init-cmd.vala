@@ -10,7 +10,7 @@ void init() {
 
     pkg_builder.begin_object();
     pkg_builder.set_member_name("$schema");
-    pkg_builder.add_string_value("https://aleks.rutins.com/projects/valapkg/project.schema.json");
+    pkg_builder.add_string_value("https://aleksrutins.github.io/valapkg/project.schema.json");
     pkg_builder.set_member_name("name");
     pkg_builder.add_string_value(projectName);
     pkg_builder.set_member_name("author");

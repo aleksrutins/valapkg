@@ -17,7 +17,7 @@ namespace Package {
         os.close();
     }
     string install(string name) {
-        string branch = "master";
+        string? branch = null;
         string repo = name;
         string pkg_name = "";
         var console = new Console("package/install");
@@ -26,10 +26,14 @@ namespace Package {
             repo = name.split("@")[0];
         }
         pkg_name = repo.split("/")[1];
-        Posix.system("mkdir -p modules");
         try {
+            Util.spawn_stdout("mkdir -p modules");
             var sp = Spinner.createAndStart(@"Cloning repository $repo...");
-            Util.spawn_stdout_v("git", "submodule", "add", "-b", branch, @"git://github.com/$repo.git", @"modules/$pkg_name");
+            if(branch != null) {
+                Util.spawn_stdout_v("git", "submodule", "add", "-b", branch, @"https://github.com/$repo.git", @"modules/$pkg_name");
+            } else {
+                Util.spawn_stdout_v("git", "submodule", "add", @"https://github.com/$repo.git", @"modules/$pkg_name");
+            }
             sp.stop(@"Cloned $repo in modules/$pkg_name.");
         } catch (Error e) {
             console.error("An error occured when cloning. Please make sure the repo exists and you have Git installed.");
