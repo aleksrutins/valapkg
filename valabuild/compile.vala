@@ -127,7 +127,7 @@ namespace Valabuild {
 						}
 					}
 				} catch(Error e) {
-					print(@"\033[1;31m$(e.message)\033[0m]\n");
+					print(@"\033[1;31m$(e.message)\033[0m\n");
 					Posix.exit(1);
 				}
 				compile_log_id++;
