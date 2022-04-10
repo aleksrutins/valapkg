@@ -91,6 +91,11 @@ Building target \033[1m$(target.get_object().get_string_member("name"))\033[0m
 				files.add(file.get_string());
 			});
 		}
+		if(target.get_object().has_member("pkgs")) {
+			target.get_object().get_array_member("pkgs").foreach_element((_arr, _ind, pkg) => {
+				pkgs.add(pkg.get_string());
+			});
+		}
 
 	    compile_commands.merge(Valabuild.compileAll(files, target.get_object().get_string_member("name"), pkgs));
 	});

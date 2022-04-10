@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://aleks.rutins.com/projects/valapkg/project.schema.json",
+    "$id": "https://aleksrutins.github.io/valapkg/project.schema.json",
     "title": "Project",
     "description": "A Valapkg project.json file.",
     "type": "object",
@@ -46,6 +46,13 @@
                             },
                             "files": {
                                 "description": "List of additional files for this target",
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "pkgs": {
+                                "description": "pkg-config packages to be included in the build",
                                 "type": "array",
                                 "items": {
                                     "type": "string"
