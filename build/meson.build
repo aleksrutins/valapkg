@@ -1,0 +1,1 @@
+valapkg_SOURCES += files('glob.vala')
