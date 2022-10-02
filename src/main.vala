@@ -7,7 +7,7 @@ namespace Valapkg {
             case "init":
                 var cwd = getcwd();
                 var cwd_parts = cwd.split("/");
-                var dirname = cwd_parts[cwd_parts.length];
+                var dirname = cwd_parts[cwd_parts.length-1];
                 File.new_for_path("project.json").create(FileCreateFlags.NONE).write((uint8[]) (@"
         {
             \"name\": \"$(dirname)\",
