@@ -6,6 +6,6 @@
 #endif
 /* Vala doesn't have this, for some reason... */
 char *valapkg_internal_getcwd(void) {
-  char cwd[PATH_MAX];
-  return getcwd(cwd, PATH_MAX);
+    char cwd[PATH_MAX];
+    return getcwd(cwd, PATH_MAX);
 }
