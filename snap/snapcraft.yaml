@@ -17,6 +17,6 @@ parts:
   my-part:
     # See 'snapcraft plugins'
     plugin: meson
-    source: '.'
+    source: https://github.com/aleksrutins/valapkg.git
     build-packages: [pkg-config, libglib2.0-dev, libsoup-3.0-dev, libjson-glib-dev, libgee-0.8-dev, glib-networking, valac]
     stage-packages: [libglib2.0-0, libsoup-3.0-1, libjson-glib-1.0-0, libgee-0.8-2, glib-networking, git, valac, gcc, pkg-config]
