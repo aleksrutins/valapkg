@@ -18,5 +18,5 @@ parts:
     # See 'snapcraft plugins'
     plugin: meson
     source: '.'
-    build-packages: [pkg-config, libglib2.0-dev, libsoup3.0-dev, libjson-glib-dev, libgee-0.8-dev, glib-networking, valac]
-    stage-packages: [libglib2.0-0, libsoup3.0-1, libjson-glib-1.0-0, libgee-0.8-2, glib-networking, git, valac, gcc, pkg-config]
+    build-packages: [pkg-config, libglib2.0-dev, libsoup-3.0-dev, libjson-glib-dev, libgee-0.8-dev, glib-networking, valac]
+    stage-packages: [libglib2.0-0, libsoup-3.0-1, libjson-glib-1.0-0, libgee-0.8-2, glib-networking, git, valac, gcc, pkg-config]
