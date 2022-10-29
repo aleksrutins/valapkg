@@ -6,3 +6,4 @@ subproject('vala-console')
 vala_console_dep = dependency('vala-console', fallback: ['vala-console', 'vala_console_dep'])
 
 subdir('src')
+subdir('server')
