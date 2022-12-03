@@ -1,6 +1,6 @@
 FROM quay.io/fedora/fedora:37
 
-RUN dnf install -y meson ninja-build wget gcc git vala glib-devel libsoup3-devel libgee-devel json-glib-devel
+RUN dnf install -y meson ninja-build wget gcc git vala glib-devel libsoup3-devel libgee-devel json-glib-devel libpq-devel
 ADD . /app
 WORKDIR /app
 

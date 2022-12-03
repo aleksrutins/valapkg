@@ -1,0 +1,1 @@
+psql -f dbinit.sql $DATABASE_URL

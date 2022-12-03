@@ -8,6 +8,12 @@ void main() {
         msg.set_response("text/html", Soup.MemoryUse.COPY, body.data);
     });
 
+    server.add_handler("/another-thing", (server, msg, path, query) => {
+        msg.set_status(200, "OK");
+        var body = "Hello World, another thing";
+        msg.set_response("text/html", Soup.MemoryUse.COPY, body.data);
+    });
+
     try {
         var main_loop = new MainLoop(null, false);
         server.listen_all(int.parse(Environment.get_variable("PORT") ?? "8080"), Soup.ServerListenOptions.IPV4_ONLY);
