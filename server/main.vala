@@ -10,7 +10,7 @@ void main() {
 
     try {
         var main_loop = new MainLoop(null, false);
-        server.listen_all(int.parse(Environment.get_variable("PORT") ?? "8080"), Soup.ServerListenOptions.IPV6_ONLY);
+        server.listen_all(int.parse(Environment.get_variable("PORT") ?? "8080"), Soup.ServerListenOptions.IPV4_ONLY);
         console.log(@"Listening on port $(Environment.get_variable("PORT") ?? "8080")");
         main_loop.run();
     } catch(Error e) {
