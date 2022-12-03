@@ -7,7 +7,7 @@ WORKDIR /app
 ARG DATABASE_URL
 ENV DATABASE_URL=${DATABASE_URL}
 
-RUN git submodule update --init
+RUN git clone https://github.com/aleksrutins/vala-console subprojects/vala-console
 RUN meson builddir && ninja -C builddir
 
 ARG SECRET_KEY
