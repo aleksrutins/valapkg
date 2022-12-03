@@ -3,6 +3,7 @@ using Valapkg.Internal;
 namespace Valapkg {
     void main(string[] args) {
         try {
+            new ValaConsole.Console("valapkg").log("Hi");
             switch (args[0]) {
             case "init":
                 var cwd = getcwd();
