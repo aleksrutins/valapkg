@@ -16,4 +16,4 @@ ENV SECRET_KEY=${SECRET_KEY}
 ARG PORT
 ENV PORT=${PORT}
 
-CMD [ "./builddir/server/valapkg-server" ]
+CMD [ "/app/builddir/server/valapkg-server" ]
