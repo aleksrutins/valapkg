@@ -13,6 +13,8 @@ int main() {
     }
     global_db = Postgres.connect_db(conn_url);
     console.log("Database connected!");
+    console.log("Preparing queries...");
+    prepare_queries();
 
     server.request_finished.connect(msg => {
         console.log(@"$(msg.get_method()) $(msg.get_uri().get_path()) $(msg.get_status())");
