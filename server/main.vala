@@ -26,11 +26,7 @@ int main() {
         msg.set_response("text/html", Soup.MemoryUse.COPY, body.data);
     });
 
-    server.add_handler("/another-thing", (server, msg, path, query) => {
-        msg.set_status(200, "OK");
-        var body = "Hello World, another thing";
-        msg.set_response("text/html", Soup.MemoryUse.COPY, body.data);
-    });
+    server.add_handler("/api", API.api_handler);
 
     try {
         var main_loop = new MainLoop(null, false);
