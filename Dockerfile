@@ -2,9 +2,6 @@ FROM quay.io/fedora/fedora:37
 
 RUN dnf install -y meson ninja-build wget gcc git vala glib-devel libsoup3-devel libgee-devel json-glib-devel libpq-devel
 
-# disgusting workaround
-RUN mkdir -p /usr/include/postgresql && ln -s /usr/include/libpq-fe.h /usr/include/postgresql/libpq-fe.h
-
 ADD . /app
 WORKDIR /app
 
