@@ -1,6 +1,6 @@
 valapkg_server_src = []
 
-valapkg_server_src += files('main.vala')
+valapkg_server_src += files('main.vala', 'db.vala', 'api.vala')
 executable('valapkg-server', valapkg_server_src, dependencies: [
     dependency('libsoup-3.0'),
     dependency('gee-0.8'),
