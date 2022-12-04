@@ -5,5 +5,10 @@ project('valapkg', ['vala', 'c'],
 subproject('vala-console')
 vala_console_dep = dependency('vala-console', fallback: ['vala-console', 'vala_console_dep'])
 
-subdir('src')
-subdir('server')
+if get_option('build_client')
+  subdir('src')
+endif
+
+if get_option('build_server')
+  subdir('server')
+endif

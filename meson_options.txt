@@ -1,0 +1,2 @@
+option('build_server', type: 'boolean', value: false)
+option('build_client', type: 'boolean', value: true)
