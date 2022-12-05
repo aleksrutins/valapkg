@@ -5,6 +5,7 @@ string read_file(File file) throws GLib.Error {
     var istream = file.read();
     istream.seek(0, SeekType.END);
     var buffer = new uint8[istream.tell()];
+    istream.seek(0, SeekType.SET);
     size_t len;
     istream.read_all(buffer, out len);
     return (string)buffer;
@@ -13,6 +14,12 @@ string read_file(File file) throws GLib.Error {
 int main() {
     var console = new ValaConsole.Console("server");
     var server = (Soup.Server)Object.new(typeof(Soup.Server));
+
+    var mime_types = new Gee.HashMap<string, string>();
+    mime_types["json"] = "application/json";
+    mime_types["html"] = "text/html";
+    mime_types["js"] = "text/javascript";
+    mime_types["css"] = "text/css";
 
     console.log("Connecting to database...");
     var conn_url = Environment.get_variable("DATABASE_URL");
@@ -48,17 +55,10 @@ int main() {
         }
         string content_type = "";
         var filename_parts = relative_path.split(".");
-        switch(filename_parts[filename_parts.length-1]) {
-            case "html":
-                content_type = "text/html";
-                break;
-            case "js":
-                content_type = "application/javascript";
-                break;
-            default:
-                content_type = "text/plain";
-                break;
-        }
+        if(mime_types.has_key(filename_parts[filename_parts.length-1]))
+            content_type = mime_types[filename_parts[filename_parts.length-1]];
+        else
+            content_type = "text/plain";
         msg.set_response(content_type, Soup.MemoryUse.COPY, result.data);
     });
 
