@@ -1,0 +1,4 @@
+[wrap-git]
+url = https://github.com/aleksrutins/prosody.git
+revision = master
+depth = 1

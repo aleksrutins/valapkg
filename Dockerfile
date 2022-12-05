@@ -8,7 +8,6 @@ WORKDIR /app
 ARG DATABASE_URL
 ENV DATABASE_URL=${DATABASE_URL}
 
-RUN git clone https://github.com/aleksrutins/vala-console subprojects/vala-console
 RUN meson builddir -Dbuild_server=true -Dbuild_client=false && ninja -C builddir
 
 ARG SECRET_KEY

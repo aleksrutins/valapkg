@@ -3,7 +3,9 @@ project('valapkg', ['vala', 'c'],
   default_options : ['warning_level=3'])
 
 subproject('vala-console')
+subproject('prosody')
 vala_console_dep = dependency('vala-console', fallback: ['vala-console', 'vala_console_dep'])
+prosody_dep = dependency('prosody', fallback: ['prosody', 'prosody_dep'])
 
 include_dirs = []
 
