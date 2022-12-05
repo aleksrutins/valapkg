@@ -85,7 +85,7 @@ namespace Valapkg.Server.API {
 
     void send_error(Soup.ServerMessage msg, int code, string error) {
         msg.set_status(code, error);
-        msg.set_response("application/json", Soup.MemoryUse.STATIC, @"{\"status\": $(code), \"error\": \"$(error)\"}".data);
+        msg.set_response("application/json", Soup.MemoryUse.COPY, @"{\"status\": $(code), \"error\": \"$(error)\"}".data);
     }
 
     void api_handler(Soup.Server server, Soup.ServerMessage msg, string path, HashTable<string, string>? query) {

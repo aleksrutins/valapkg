@@ -1,6 +1,15 @@
 using Valapkg.Server;
 using Valapkg.Server.DB;
 
+string read_file(File file) throws GLib.Error {
+    var istream = file.read();
+    istream.seek(0, SeekType.END);
+    var buffer = new uint8[istream.tell()];
+    size_t len;
+    istream.read_all(buffer, out len);
+    return (string)buffer;
+}
+
 int main() {
     var console = new ValaConsole.Console("server");
     var server = (Soup.Server)Object.new(typeof(Soup.Server));
@@ -22,8 +31,35 @@ int main() {
 
     server.add_handler("/", (server, msg, path, query) => {
         msg.set_status(200, "OK");
-        var body = "Hello World";
-        msg.set_response("text/html", Soup.MemoryUse.COPY, body.data);
+
+        var relative_path = path.length == 1 ? "" : path.slice(1, path.length);
+        if(relative_path == "" || !File.new_for_path(relative_path).query_exists(null))
+            relative_path = "index.html";
+
+        console.log(@"Serve static $(relative_path)");
+        var file = File.new_for_path("static/" + relative_path);
+        string result = "";
+        try {
+            result = read_file(file);
+        } catch(Error e) {
+            console.error(e.message);
+            API.send_error(msg, 500, "Internal Server Error");
+            return;
+        }
+        string content_type = "";
+        var filename_parts = relative_path.split(".");
+        switch(filename_parts[filename_parts.length-1]) {
+            case "html":
+                content_type = "text/html";
+                break;
+            case "js":
+                content_type = "application/javascript";
+                break;
+            default:
+                content_type = "text/plain";
+                break;
+        }
+        msg.set_response(content_type, Soup.MemoryUse.COPY, result.data);
     });
 
     server.add_handler("/api", API.api_handler);
