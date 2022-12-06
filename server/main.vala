@@ -35,7 +35,6 @@ int main() {
     server.request_finished.connect(msg => {
         console.log(@"$(msg.get_method()) $(msg.get_uri().get_path()) $(msg.get_status())");
     });
-
     server.add_handler("/", (server, msg, path, query) => {
         msg.set_status(200, "OK");
 
@@ -44,12 +43,11 @@ int main() {
                 Prosody.ErrorData error_data = null;
                 var template = Prosody.get_for_path("templates/index.html", ref error_data);
                 var writer = new Prosody.CaptureWriter();
-                var finished = false;
-                var finished_ref = &finished;
                 template.exec.begin(new Prosody.Data.Empty(), writer, () => {
                     msg.set_response("text/html", Soup.MemoryUse.COPY, writer.grab_string().data);
-                    *finished_ref = true;
+                    msg.unpause();
                 });
+                msg.pause();
                 return;
             }
         } catch(Error e) {
