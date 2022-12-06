@@ -7,6 +7,10 @@
     <title>Valapkg</title>
 </head>
 <body>
-    
+    Releases
+    {% for release in releases %}
+        Release
+        {{release.ident.package}}
+    {% endfor %}
 </body>
-</html>
+</html> 

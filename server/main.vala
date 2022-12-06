@@ -11,6 +11,21 @@ string read_file(File file) throws GLib.Error {
     return (string)buffer;
 }
 
+/** Render a template. RETURN IMMEDIATELY FROM THE HANDLER AFTER CALLING THIS! */
+void render_template(Soup.ServerMessage msg, string name, Prosody.Data.Data data, ref Prosody.ErrorData? error_data) throws Error {
+    var template = Prosody.get_for_path("templates/index.html", ref error_data);
+    var writer = new Prosody.CaptureWriter();
+    template.exec.begin(data, writer, () => {
+        msg.set_response("text/html", Soup.MemoryUse.COPY, writer.grab_string().data);
+        msg.unpause();
+    });
+    msg.pause();
+}
+
+class IndexData : Object {
+    public API.Release[] releases {get; set;}
+}
+
 int main() {
     var console = new ValaConsole.Console("server");
     var server = (Soup.Server)Object.new(typeof(Soup.Server));
@@ -41,13 +56,10 @@ int main() {
         try {
             if(path == "/") {
                 Prosody.ErrorData error_data = null;
-                var template = Prosody.get_for_path("templates/index.html", ref error_data);
-                var writer = new Prosody.CaptureWriter();
-                template.exec.begin(new Prosody.Data.Empty(), writer, () => {
-                    msg.set_response("text/html", Soup.MemoryUse.COPY, writer.grab_string().data);
-                    msg.unpause();
-                });
-                msg.pause();
+                var map = new Gee.HashMap<Slice, Prosody.Data.Data>();
+            //  map.set(new Slice.s("releases"), new Prosody.Data.List(API.all_releases().map((release) => Prosody.Data.)));
+                var data = new Prosody.Data.Mapping(map);
+                render_template(msg, "templates/index.html", data, ref error_data);
                 return;
             }
         } catch(Error e) {

@@ -37,8 +37,6 @@ namespace Valapkg.Server.API {
 
     class Release : Object {
         public ReleaseIdentifier ident {get; set;}
-        public string package {get; set;}
-        public string version {get; set;}
         public string source {get; set;}
         public Release.from_pg(Postgres.Result res, int row_num) {
             ident =  new ReleaseIdentifier.from_pg(res, row_num);
