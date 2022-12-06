@@ -22,8 +22,16 @@ void render_template(Soup.ServerMessage msg, string name, Prosody.Data.Data data
     msg.pause();
 }
 
+Gee.List<T> iterator_to_list<T>(Gee.Iterator<T> iter) {
+    var list = new Gee.LinkedList<T>();
+    for(var item = iter.get(); iter.next(); item = iter.get()) {
+        list.add(item);
+    }
+    return list;
+}
+
 class IndexData : Object {
-    public API.Release[] releases {get; set;}
+    public Gee.List<API.Release> releases {get; set;}
 }
 
 int main() {
@@ -56,10 +64,11 @@ int main() {
         try {
             if(path == "/") {
                 Prosody.ErrorData error_data = null;
+                var release_list = API.all_releases().map<Prosody.Data.Data>((release) => release.to_data());
+                var list_data = new Prosody.Data.List(iterator_to_list(release_list));
                 var map = new Gee.HashMap<Slice, Prosody.Data.Data>();
-            //  map.set(new Slice.s("releases"), new Prosody.Data.List(API.all_releases().map((release) => Prosody.Data.)));
-                var data = new Prosody.Data.Mapping(map);
-                render_template(msg, "templates/index.html", data, ref error_data);
+                map.set(new Slice.s("releases"), list_data);
+                render_template(msg, "templates/index.html", new Prosody.Data.Mapping(map), ref error_data);
                 return;
             }
         } catch(Error e) {

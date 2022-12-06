@@ -7,6 +7,8 @@
     <title>Valapkg</title>
 </head>
 <body>
-    
+    {% for release in releases %}
+        {{ release.owner }}
+    {% endfor %}
 </body>
 </html>

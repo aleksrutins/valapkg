@@ -42,6 +42,11 @@ namespace Valapkg.Server.API {
             ident =  new ReleaseIdentifier.from_pg(res, row_num);
             source = res.get_value(row_num, 3);
         }
+        public Prosody.Data.Data to_data() {
+            var map = new Gee.HashMap<Slice, Prosody.Data.Data>();
+            map.set(new Slice.s("owner"), new Prosody.Data.Literal(ident.owner));
+            return new Prosody.Data.Mapping(map);
+        }
     }
 
     class Dependency : Object {
