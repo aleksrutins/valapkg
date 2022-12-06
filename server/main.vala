@@ -39,9 +39,30 @@ int main() {
     server.add_handler("/", (server, msg, path, query) => {
         msg.set_status(200, "OK");
 
+        try {
+            if(path == "/") {
+                Prosody.ErrorData error_data = null;
+                var template = Prosody.get_for_path("templates/index.html", ref error_data);
+                var writer = new Prosody.CaptureWriter();
+                var finished = false;
+                var finished_ref = &finished;
+                template.exec.begin(new Prosody.Data.Empty(), writer, () => {
+                    msg.set_response("text/html", Soup.MemoryUse.COPY, writer.grab_string().data);
+                    *finished_ref = true;
+                });
+                return;
+            }
+        } catch(Error e) {
+            console.error(e.message);
+            API.send_error(msg, 500, "Internal Server Error");
+            return;
+        }
+
         var relative_path = path.length == 1 ? "" : path.slice(1, path.length);
-        if(relative_path == "" || !File.new_for_path(relative_path).query_exists(null))
-            relative_path = "index.html";
+        if(relative_path == "" || !File.new_for_path(relative_path).query_exists(null)) {
+            msg.set_status(404, "Not Found");
+            relative_path = "404.html";
+        }
 
         console.log(@"Serve static $(relative_path)");
         var file = File.new_for_path("static/" + relative_path);
