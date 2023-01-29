@@ -1,5 +1,6 @@
 using Valapkg.Server;
 using Valapkg.Server.DB;
+using Prosody;
 
 string read_file(File file) throws GLib.Error {
     var istream = file.read();
@@ -11,11 +12,19 @@ string read_file(File file) throws GLib.Error {
     return (string)buffer;
 }
 
+Json.Array list_to_json(Gee.List<Object> list) {
+    var arr = new Json.Array.sized(list.size);
+    foreach(var item in list) {
+        arr.add_element(Json.gobject_serialize(item));
+    }
+    return arr;
+}
+
 /** Render a template. RETURN IMMEDIATELY FROM THE HANDLER AFTER CALLING THIS! */
-void render_template(Soup.ServerMessage msg, string name, Prosody.Data.Data data, ref Prosody.ErrorData? error_data) throws Error {
+void render_template(Soup.ServerMessage msg, string name, Json.Node json_data, ref Prosody.ErrorData? error_data) throws Error {
     var template = Prosody.get_for_path("templates/index.html", ref error_data);
     var writer = new Prosody.CaptureWriter();
-    template.exec.begin(data, writer, () => {
+    template.exec.begin(xJSON.build(json_data), writer, () => {
         msg.set_response("text/html", Soup.MemoryUse.COPY, writer.grab_string().data);
         msg.unpause();
     });
@@ -35,6 +44,8 @@ class IndexData : Object {
 }
 
 int main() {
+
+    Std.register_standard_library();
     var console = new ValaConsole.Console("server");
     var server = (Soup.Server)Object.new(typeof(Soup.Server));
 
@@ -64,11 +75,11 @@ int main() {
         try {
             if(path == "/") {
                 Prosody.ErrorData error_data = null;
-                var release_list = API.all_releases().map<Prosody.Data.Data>((release) => release.to_data());
-                var list_data = new Prosody.Data.List(iterator_to_list(release_list));
-                var map = new Gee.HashMap<Slice, Prosody.Data.Data>();
-                map.set(new Slice.s("releases"), list_data);
-                render_template(msg, "templates/index.html", new Prosody.Data.Mapping(map), ref error_data);
+                var release_list = API.all_releases();
+                var list_data = list_to_json(release_list);
+                var map = new Json.Object();
+                map.set_array_member("releases", list_data);
+                render_template(msg, "templates/index.html", new Json.Node.alloc().init_object(map), ref error_data);
                 return;
             }
         } catch(Error e) {
