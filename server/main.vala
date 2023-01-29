@@ -44,9 +44,11 @@ class IndexData : Object {
 }
 
 int main() {
-
+    var load_spinner = ValaConsole.Spinner.createAndStart("Loading .env", "Finished setup.", new ValaConsole.Charsets.Useful.Dots());
+    
     Dotenv.try_load();
 
+    load_spinner.str.spinner.msg = "Initializing";
     Std.register_standard_library();
     var console = new ValaConsole.Console("server");
     var server = (Soup.Server)Object.new(typeof(Soup.Server));
@@ -57,15 +59,14 @@ int main() {
     mime_types["js"] = "text/javascript";
     mime_types["css"] = "text/css";
 
-    console.log("Connecting to database...");
+    load_spinner.str.spinner.msg = "Connecting to database...";
     var conn_url = Environment.get_variable("DATABASE_URL");
     if(conn_url == null) {
-        console.error("Please provide a $DATABASE_URL.");
+        load_spinner.stop("Please provide a $DATABASE_URL.", true);
         return 1;
     }
     global_db = Postgres.connect_db(conn_url);
-    console.log("Database connected!");
-    console.log("Preparing queries...");
+    load_spinner.str.spinner.msg = "Preparing queries...";
     prepare_queries();
 
     server.request_finished.connect(msg => {
@@ -120,6 +121,7 @@ int main() {
     try {
         var main_loop = new MainLoop(null, false);
         server.listen_all(int.parse(Environment.get_variable("PORT") ?? "8080"), Soup.ServerListenOptions.IPV4_ONLY);
+        load_spinner.stop(null, false);
         console.log(@"Listening on port $(Environment.get_variable("PORT") ?? "8080")");
         main_loop.run();
     } catch(Error e) {
