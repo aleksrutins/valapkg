@@ -10,7 +10,7 @@
     <h1>Releases</h1>
     <ul>
     {% for release in releases %}
-      <li>{{release.ident.package}}</li>
+      <li>{{release.ident.owner}}/{{release.ident.package}}</li>
     {% endfor %}
     </ul>
 </body>

@@ -45,6 +45,8 @@ class IndexData : Object {
 
 int main() {
 
+    Dotenv.try_load();
+
     Std.register_standard_library();
     var console = new ValaConsole.Console("server");
     var server = (Soup.Server)Object.new(typeof(Soup.Server));
