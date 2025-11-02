@@ -44,10 +44,15 @@ namespace Valabuild {
 				cargs.remove_at(i);
 			}
 		}
+
+		var output = outNames.split(" ")[0];
+		var outParts = new Gee.ArrayList<string>.wrap(output.split("/"));
+		Util.spawn_stdout_v("mkdir", "-p",  outParts.slice(0, outParts.size-2));
+		
 		var cmd = new CompileCommands.Command() {
 			file = files[0],
 			directory = (string)vala_getcwd(),
-			output = outNames.split(" ")[0],
+			output = output,
 			arguments = cargs.to_array()
 		};
 		var compile_output = Util.spawn_stdout_args(cargs.to_array());

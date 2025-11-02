@@ -2,5 +2,7 @@
     "mesonbuild.configureOnOpen": true,
     "files.associations": {
         "vector": "cpp"
-    }
+    },
+    "C_Cpp.default.compileCommands": "/home/aleks/Projects/valapkg/builddir/compile_commands.json",
+    "C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild"
 }
