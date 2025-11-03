@@ -1,7 +1,6 @@
 project('valapkg', 'c', 'cpp', 'vala',
     default_options: ['cpp_std=c++17']
 )
-subdir('vala-console')
 
 valapkg_SOURCES = [
     'main.vala',
@@ -15,7 +14,7 @@ valapkg_SOURCES = [
     'remove.vala',
     'compile-commands.vala',
     'getcwd.c',
-    ] + vala_console_SOURCES
+    ]
 
 subdir('build')
 
@@ -27,6 +26,7 @@ dependencies = [
     #dependency('libsoup-2.4'),
     dependency('json-glib-1.0'),
     dependency('gee-0.8'),
+    dependency('vala-console'),
     meson.get_compiler('vala').find_library('posix')
 ]
 

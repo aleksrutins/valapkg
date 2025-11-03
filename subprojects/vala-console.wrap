@@ -1,0 +1,7 @@
+[wrap-git]
+directory = vala-console
+url = https://github.com/aleksrutins/vala-console
+revision = HEAD
+
+[provide]
+vala-console = vala_console_dep
