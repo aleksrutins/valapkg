@@ -1,0 +1,22 @@
+package:
+  name: valapkg
+  version: 0.1.0
+
+source:
+  path: .
+  use_gitignore: true 
+
+build:
+  number: 0
+  script: | 
+    meson $MESON_ARGS $SRC_DIR/../build
+    meson install -C $SRC_DIR/../build
+
+requirements:
+  build: 
+    - ${{ compiler('c') }}
+    - vala
+    - meson
+    - ninja
+  host:
+    - glib

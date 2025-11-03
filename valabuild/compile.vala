@@ -28,14 +28,14 @@ namespace Valabuild {
 		}
 	}
 
-	public CompileResult compile(string args, string file, Select.Compiler compiler, Console console, string log_file_name) throws Error {
+	public CompileResult compile(string args, string file, Select.Compiler compiler, Console console, Spinner sp, Spinner.SpinThread.Helper sph, string log_file_name) throws Error {
 		var files = file.split(" ");
 		var nFiles = files.length;
 		var outNames = compiler.outRule(file, "builddir");
 		var cmd_str = compiler.cmd(file, "builddir", outNames, args);
 		var message = @"Compiling $file";
 		if(nFiles > 1) message = @"Compiling $nFiles files";
-		var sp = Spinner.createAndStart(message, @"Compiled $(nFiles > 1 ? @"$nFiles files" : file)");
+		sp.msg = message;
 		var cargs = new Gee.ArrayList<string>();
 		cargs.add_all(new Gee.ArrayList<string>.wrap(cmd_str.split(" ")));
 		cargs.add((string)0);
@@ -47,7 +47,7 @@ namespace Valabuild {
 
 		var output = outNames.split(" ")[0];
 		var outParts = new Gee.ArrayList<string>.wrap(output.split("/"));
-		Util.spawn_stdout_v("mkdir", "-p",  outParts.slice(0, outParts.size-2));
+		Util.spawn_stdout_v("mkdir", "-p",  string.joinv("/", outParts.slice(0, outParts.size-2).to_array()));
 		
 		var cmd = new CompileCommands.Command() {
 			file = files[0],
@@ -56,11 +56,12 @@ namespace Valabuild {
 			arguments = cargs.to_array()
 		};
 		var compile_output = Util.spawn_stdout_args(cargs.to_array());
-		if(compile_output.status == 0) sp.stop();
-		else sp.stop("Failed compilation", true);
-		if(compile_output.stderr.length > 0 || compile_output.stdout.length > 0) {
-			print((string)compile_output.stdout.data);
-			print((string)compile_output.stderr.data);
+		if(compile_output.status != 0) {
+			sph.stop("Failed compilation", true);
+			if(compile_output.stderr.length > 0 || compile_output.stdout.length > 0) {
+				stdout.write(compile_output.stdout.data);
+				stderr.write(compile_output.stderr.data);
+			}
 		}
 		if(compile_output.status != 0) {
 			throw new Error(Quark.from_string("compile"), compile_output.status, "Failed compilation");
@@ -90,7 +91,7 @@ namespace Valabuild {
 		return sorted;
 	}
 
-	private Gee.ArrayList<string> compileFiles(FileList files, Gee.Iterable<string> pkgs, Gee.List<string> pkg_args, ref CompileCommands.Builder compile_commands, ValaConsole.Console console, string output_name) {
+	private Gee.ArrayList<string> compileFiles(FileList files, Gee.Iterable<string> pkgs, Gee.List<string> pkg_args, Spinner sp, Spinner.SpinThread.Helper sph, ref CompileCommands.Builder compile_commands, ValaConsole.Console console, string output_name) {
 		var output = new Gee.ArrayList<string>();
 		var intermediates = files;
 		int compile_log_id = 0;
@@ -107,14 +108,14 @@ namespace Valabuild {
 						pkg_args_spaced = string.joinv(" ", pkg_args.to_array()).replace("\n", "");
 					}
 					if(compiler.isVala) {
-						var compileResult = compile(pkg_args_spaced, string.joinv(" ", entry.names.to_array()), compiler, console, @"builddir/compile.$output_name.$compile_log_id.log");
+						var compileResult = compile(pkg_args_spaced, string.joinv(" ", entry.names.to_array()), compiler, console, sp, sph, @"builddir/compile.$output_name.$compile_log_id.log");
 						var outFromVala = new Gee.ArrayList<string>.wrap(compileResult.outNames.replace("\n", "").split(" "));
 						var sorted = sort(outFromVala);
 						compile_commands.add(compileResult.cmd);
 						intermediates.add_all(sorted);
 					} else {
 						foreach (var name in entry.names) {
-							var result = compile(pkg_args_spaced, name, compiler, console, @"builddir/compile.$output_name.$compile_log_id.log");
+						var result = compile(pkg_args_spaced, name, compiler, console, sp, sph, @"builddir/compile.$output_name.$compile_log_id.log");
 							compile_commands.add(result.cmd);
 							output.add_all(new Gee.ArrayList<string>.wrap(result.outNames.replace("\n", "").split(" ")));
 						}
@@ -136,6 +137,7 @@ namespace Valabuild {
 		base_pkgs.@foreach(pkg => pkgs.add(pkg));
 		var pkg_args = new Gee.ArrayList<string>();
 		var compile_commands = new CompileCommands.Builder();
+		var sp = Spinner.createAndStart("Compiling", "Successfully compiled", new ValaConsole.Charsets.Useful.Dots());
 		try {
 			foreach(string pkg in pkgs) {
 				pkg_args.add_all(new Gee.ArrayList<string>.wrap(Util.spawn_stdout("pkg-config --libs --cflags " + pkg).stdout.replace("\n", "").split(" ")));
@@ -144,9 +146,9 @@ namespace Valabuild {
 			console.error("Error running pkg-config");
 		}
 		var sorted = sort(files);
-		var output = compileFiles(sorted, pkgs, pkg_args, ref compile_commands, console, output_name);
+		var output = compileFiles(sorted, pkgs, pkg_args, sp.str.spinner, sp, ref compile_commands, console, output_name);
 		var out_array = output.to_array();
-		var sp = Spinner.createAndStart(@"Linking $output_name...");
+		sp.str.spinner.msg = @"Linking $output_name...";
 		Util.Output link_output = Util.Output();
 		var log = File.new_for_path(@"builddir/link.$output_name.log");
 		try {
