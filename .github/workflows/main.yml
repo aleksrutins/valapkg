@@ -23,7 +23,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v5
       
       - name: Update submodules
         run: git submodule update --init
@@ -38,9 +38,9 @@ jobs:
           meson setup builddir
           ninja -C builddir
       - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v2.2.3
+        uses: actions/upload-artifact@v5
         with:
           # Artifact name
-          name: output
+          name: valapkg-linux-x86_64
           # A file, directory or wildcard pattern that describes what to upload
           path: builddir/valapkg
